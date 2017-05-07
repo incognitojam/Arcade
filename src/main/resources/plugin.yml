@@ -1,0 +1,3 @@
+name: Arcade
+version: @version@
+main: com.github.incognitojam.arcade.Arcade
