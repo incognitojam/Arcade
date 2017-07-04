@@ -1,5 +1,5 @@
 buildscript {
-    ext.kotlin_version = '1.1.2'
+    ext.kotlin_version = '1.1.2-2'
     repositories {
         mavenCentral()
     }
@@ -9,6 +9,7 @@ buildscript {
 }
 
 apply plugin: 'java'
+apply plugin: 'eclipse'
 apply plugin: 'kotlin'
 
 group = pluginGroup
@@ -32,13 +33,12 @@ repositories {
 dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.11'
     compile "org.jetbrains.kotlin:kotlin-stdlib-jre8:$kotlin_version"
-    compile 'org.spigotmc:spigot-api:1.11.2-R0.1-SNAPSHOT'
+    compile "org.spigotmc:spigot-api:1.11.2-R0.1-SNAPSHOT"
+    compile "com.twelvemonkeys.imageio:imageio-batik:3.3.2"
+    compile "org.apache.xmlgraphics:batik-transcoder:1.9"
 }
 
-import org.apache.tools.ant.filters.ReplaceTokens
-
-processResources {
-    from(sourceSets.main.resources.srcDirs) {
-        filter ReplaceTokens, tokens: [version: version]
-    }
+jar {
+    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+    destinationDir = file("D:/Minecraft Development/Servers/Spigot Server/plugins")
 }

@@ -1,7 +1,10 @@
 package com.github.incognitojam.arcade.machine;
 
 import com.github.incognitojam.arcade.Arcade;
+import com.github.incognitojam.arcade.display.Display;
 
+import javax.script.ScriptEngineManager;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -9,16 +12,22 @@ import java.util.UUID;
 public class MachineManager {
 
     private final Arcade arcade;
-    private Map<Integer, Machine> machineMap;
+    private ScriptEngineManager manager;
+    private Map<Short, Machine> machineMap;
 
     public MachineManager(Arcade arcade) {
         this.arcade = arcade;
+        this.manager = new ScriptEngineManager();
 
         loadMachines();
         verifyMachines();
     }
 
-    void dispose() {
+    public void onUpdate() {
+        machineMap.values().forEach(Machine::onUpdate);
+    }
+
+    public void dispose() {
         saveMachines();
     }
 
@@ -34,28 +43,52 @@ public class MachineManager {
 
     }
 
-    boolean doesMachineExist(int machineId) {
+    public boolean doesMachineExist(short machineId) {
         return this.machineMap.containsKey(machineId);
     }
 
-    Machine getMachine(int machineId) {
+    public Machine getMachine(short machineId) {
         return this.machineMap.get(machineId);
     }
 
-    Machine createMachine(UUID ownerUniqueId) {
-        int machineId = getFirstAvailableId();
+    public Machine findMachine(Display display) {
+        for (Machine machine : machineMap.values()) {
+            if (machine.getContext() != null && display.equals(machine.getContext().getDisplay())) {
+                return machine;
+            }
+        }
+        return null;
+    }
+
+    public ArrayList<Machine> getMachines() {
+        return new ArrayList<>(machineMap.values());
+    }
+
+    public Machine createMachine(UUID ownerUniqueId) {
+        short machineId = getFirstAvailableId();
         Machine machine = new Machine(machineId, ownerUniqueId);
+        Context context = createContext(machine);
+        machine.setContext(context);
+
+        machineMap.put(machineId, machine);
+
         return machine;
     }
 
-    MachineContext createContext() {
-        MachineContext context = new MachineContext()
+    public void removeMachine(short machineId) {
+        Machine machine = machineMap.remove(machineId);
+        // TODO
+//        machine.dispose();
     }
 
-    private int getFirstAvailableId() {
-        int id = 0;
+    public Context createContext(Machine machine) {
+//        ScriptEngine engine = manager.getEngineByExtension("kotlin");
+        return new Context(machine);
+    }
+
+    private short getFirstAvailableId() {
+        short id = 0;
         while (doesMachineExist(id)) id++;
         return id;
     }
-
 }
