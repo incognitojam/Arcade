@@ -1,0 +1,7 @@
+name: Arcade
+version: 1.0
+main: dev.incognitojam.arcade.ArcadePlugin
+api-version: '1.20'
+authors: [ incognitojam ]
+description: Interactive games
+website: https://github.com/incognitojam/arcade
